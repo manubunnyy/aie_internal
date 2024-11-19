@@ -1,0 +1,35 @@
+% Facts defining the graph
+edge(a, b).
+edge(a, c).
+edge(b, d).
+edge(c, e).
+
+% DFS Implementation
+dfs(Node, [Node|Path]) :- dfs_helper(Node, [], Path).
+
+dfs_helper(Node, Visited, []) :- 
+    \+ edge(Node, _); % Leaf node
+    member(Node, Visited).
+
+dfs_helper(Node, Visited, [Next|Path]) :-
+    edge(Node, Next),
+    \+ member(Next, Visited),
+    dfs_helper(Next, [Node|Visited], Path).
+
+% BFS is more complex; BFS is here
+edge(a, b).
+edge(a, c).
+edge(b, d).
+edge(c, e).
+
+bfs(Start, Path) :- bfs_helper([Start], [], Path).
+
+bfs_helper([], _, _) :- fail.
+bfs_helper([Node|_], Visited, [Node|Visited]) :- 
+    \+ member(Node, Visited).
+
+bfs_helper([Node|Rest], Visited, Path) :-
+    \+ member(Node, Visited),
+    findall(Next, (edge(Node, Next), \+ member(Next, Visited)), Neighbors),
+    append(Rest, Neighbors, NewQueue),
+    bfs_helper(NewQueue, [Node|Visited], Path).
