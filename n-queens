@@ -1,0 +1,23 @@
+:- use_module(library(clpfd)).
+
+nqueens(N, Solution) :-
+    length(Solution, N),            % Create a list of N queens
+    Solution ins 1..N,               % Each queen is placed in one of N columns (1 to N)
+    all_different(Solution),         % Ensure no two queens share the same column
+    safe_queens(Solution),           % Ensure queens don't attack each other
+    label(Solution).                 % Assign values to the variables (queens)
+
+% Ensure that no two queens share a diagonal
+safe_queens([]).                    % No queens left, trivially safe
+safe_queens([Q|Queens]) :-
+    safe_queen(Q, Queens, 1),       % Check if queen Q is safe
+    safe_queens(Queens).            % Check the rest of the queens
+
+% Check that queen Q is safe from all other queens in the list
+safe_queen(_, [], _).               % No more queens to compare to
+safe_queen(Q, [Q1|Queens], Offset) :-
+    Q #\= Q1,                       % Ensure queens are not in the same column
+    Q #\= Q1 + Offset,              % Ensure queens are not on the same major diagonal
+    Q #\= Q1 - Offset,              % Ensure queens are not on the same minor diagonal
+    Offset1 #= Offset + 1,          % Move to the next queen (increment row offset)
+    safe_queen(Q, Queens, Offset1).  % Check the rest of the queens
